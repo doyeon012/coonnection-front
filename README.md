@@ -2,7 +2,7 @@
 프로젝트 결과물 : https://www.barking-talk.org/
 
 ## 최종 발표 영상
-[![최종 발표 영상](https://img.youtube.com/vi/lYOFUXp1LhY/0.jpg)](https://www.youtube.com/watch?v=lYOFUXp1LhY)
+[![최종 발표 영상](https://img.youtube.com/vi/lYOFUXp1LhY/0.jpg)](https://www.youtube.com/watch?v=UAKpkGFhkQk)
 
 최종 발표 영상: [여기를 클릭하세요](https://www.youtube.com/watch?v=lYOFUXp1LhY)
 # 목차
