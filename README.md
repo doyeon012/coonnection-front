@@ -1,8 +1,10 @@
 # 크래프톤 정글 5기 나만의 무기: Coonnection
 프로젝트 결과물 : https://www.barking-talk.org/
 
-최종 발표 영상 <br>
+## 최종 발표 영상
+[![최종 발표 영상](https://img.youtube.com/vi/lYOFUXp1LhY/0.jpg)](https://www.youtube.com/watch?v=lYOFUXp1LhY)
 
+최종 발표 영상: [여기를 클릭하세요](https://www.youtube.com/watch?v=lYOFUXp1LhY)
 # 목차
 
 1. [프로젝트 소개](#lignin)
