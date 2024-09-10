@@ -68,28 +68,35 @@ const ReviewPage = () => {
                 );
 
                 const rankArr = [];
-                ranking.forEach((userRank, index) => {
-                    const users = response.data;
-                    users.forEach((user) => {
-                        if (user.nickname == userRank.nickname) {
-                            const profileData = callUserInfoResponse.data.find(
-                                (item) => {
-                                    return item.nickname === userRank.nickname;
+                let ranking = sessionStorage.getItem('ranking');
+                if (ranking) {
+                    ranking = JSON.parse(ranking);
+                    ranking.forEach((userRank, index) => {
+                        const users = response.data;
+                        users.forEach((user) => {
+                            if (user.nickname == userRank.nickname) {
+                                const profileData =
+                                    callUserInfoResponse.data.find((item) => {
+                                        return (
+                                            item.nickname === userRank.nickname
+                                        );
+                                    });
+                                if (profileData) {
+                                    user.profileImage =
+                                        profileData.profileImage;
+                                    user._id = profileData._id; // _id 필드 병합
                                 }
-                            );
-                            if (profileData) {
-                                user.profileImage = profileData.profileImage;
-                                user._id = profileData._id; // _id 필드 병합
+
+                                rankArr.push(user);
                             }
-
-                            rankArr.push(user);
-                        }
+                        });
                     });
-                });
-                setUserRankings(rankArr);
-                setTopTalker(ranking[0]);
-
-                console.log('Top Talker:', topTalker);
+                    setUserRankings(rankArr);
+                    setTopTalker(ranking[0]);
+                    console.log('Top Talker:', ranking[0]);
+                } else {
+                    console.error('No ranking data found in sessionStorage');
+                }
             } else {
                 console.error('No session data found');
             }
