@@ -2,11 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import logo from '../../assets/barking-talk.png'; // 로고 이미지 경로
-import videoPlaceholder from '../../assets/people.png'; // 동영상 공간을 위한 이미지
-import Declaration from '../../assets/declaration.jpg'; // 동영상 공간을 위한 이미지
 
 import crownIcon from '../../assets/crown.png'; // 왕관 아이콘 이미지
-import celebrationEffect from '../../assets/celebration.gif'; // 축하 이펙트 이미지
 
 import { apiCall } from '../../utils/apiCall';
 import { API_LIST } from '../../utils/apiList';
@@ -14,15 +11,9 @@ import { API_LIST } from '../../utils/apiList';
 const ReviewPage = () => {
     const navigate = useNavigate(); // useNavigate 훅 추가
     const [ratings, setRatings] = useState([0, 0, 0]); // 세 명의 사용자 리뷰를 관리
-    const [reportingUser, setReportingUser] = useState(null); // 신고할 사용자
-
-    const [reportReason, setReportReason] = useState(''); // 신고 이유
-    const [reportDescription, setReportDescription] = useState(''); // 신고 설명
     const userInfo = useSelector((state) => state.user.userInfo);
 
     const [sessionId, setSessionId] = useState('');
-    const [sessionData, setSessionData] = useState(null); // 세션 데이터를 저장
-    const [callUserInfo, setCallUserInfo] = useState([]); // 통화 유저 정보 저장
     const [topTalker, setTopTalker] = useState(null); // 오늘의 수다왕
 
     const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
@@ -70,81 +61,36 @@ const ReviewPage = () => {
                     { usernames }
                 );
 
-                // 사용자 정보 병합 및 필터링 (본인 제외)
-                const mergedData = callUserInfoResponse.data
-                    .filter((user) => user._id !== userInfo._id)
-                    .map((user) => ({
-                        ...user,
-                        userId: user.username,
-                        nickname: user.nickname || user.username,
-                        profileImage: user.profileImage || videoPlaceholder,
-                        utterance: user.utterance || 0,
-                    }));
-
-                /// 발화량이 가장 많은 사용자 찾기 (본인 포함)
-                const allUsers = [
-                    ...callUserInfoResponse.data,
-                    {
-                        username: userInfo.username,
-                        nickname: userInfo.nickname,
-                        utterance: userInfo.utterance || 0,
-                        profileImage: userInfo.profileImage || videoPlaceholder,
-                    },
-                ];
-                const topTalker = allUsers.reduce((prev, current) =>
-                    (prev.utterance || 0) > (current.utterance || 0)
-                        ? prev
-                        : current
-                );
-
                 const rankArr = [];
-                ranking.forEach((userRank, index) => {
-                    const users = response.data;
-                    users.forEach((user) => {
-                        if (user.nickname == userRank.nickname) {
-                            const profileData = callUserInfoResponse.data.find(
-                                (item) => {
-                                    return item.nickname === userRank.nickname;
+                let ranking = sessionStorage.getItem('ranking');
+                if (ranking) {
+                    ranking = JSON.parse(ranking);
+                    ranking.forEach((userRank, index) => {
+                        const users = response.data;
+                        users.forEach((user) => {
+                            if (user.nickname == userRank.nickname) {
+                                const profileData =
+                                    callUserInfoResponse.data.find((item) => {
+                                        return (
+                                            item.nickname === userRank.nickname
+                                        );
+                                    });
+                                if (profileData) {
+                                    user.profileImage =
+                                        profileData.profileImage;
+                                    user._id = profileData._id; // _id 필드 병합
                                 }
-                            );
-                            if (profileData) {
-                                user.profileImage = profileData.profileImage;
+
+                                rankArr.push(user);
                             }
-
-                            rankArr.push(user);
-                        }
+                        });
                     });
-                });
-                // const testArr = [
-                //     {
-                //         nickname: 'User1',
-                //         profileImage:
-                //             'https://talk-static-file-storage.s3.ap-northeast-2.amazonaws.com/img/0261765f-e398-4174-a21d-b8fb2a4eb44c-dog.jpg',
-                //     },
-                //     {
-                //         nickname: 'User2',
-                //         profileImage:
-                //             'https://talk-static-file-storage.s3.ap-northeast-2.amazonaws.com/img/0261765f-e398-4174-a21d-b8fb2a4eb44c-dog.jpg',
-                //     },
-                //     {
-                //         nickname: 'User3',
-                //         profileImage:
-                //             'https://talk-static-file-storage.s3.ap-northeast-2.amazonaws.com/img/0261765f-e398-4174-a21d-b8fb2a4eb44c-dog.jpg',
-                //     },
-                //     {
-                //         nickname: 'User4',
-                //         profileImage:
-                //             'https://talk-static-file-storage.s3.ap-northeast-2.amazonaws.com/img/0261765f-e398-4174-a21d-b8fb2a4eb44c-dog.jpg',
-                //     },
-                // ];
-                setUserRankings(rankArr);
-
-                setTopTalker(ranking[0]);
-                setSessionData(mergedData);
-                setCallUserInfo(mergedData);
-                setRatings(new Array(mergedData.length).fill(0));
-
-                console.log('Top Talker:', topTalker);
+                    setUserRankings(rankArr);
+                    setTopTalker(ranking[0]);
+                    console.log('Top Talker:', ranking[0]);
+                } else {
+                    console.error('No ranking data found in sessionStorage');
+                }
             } else {
                 console.error('No session data found');
             }
@@ -165,8 +111,8 @@ const ReviewPage = () => {
         try {
             await apiCall(API_LIST.SUBMIT_REVIEW, {
                 sessionId,
-                reviews: sessionData.map((user, index) => ({
-                    userId: user._id, // userId를 username으로 변경
+                reviews: userRankings.map((_id, index) => ({
+                    userId: _id, // userId를 username으로 변경
                     rating: ratings[index],
                 })),
             });
@@ -180,22 +126,6 @@ const ReviewPage = () => {
             console.error('Error submitting reviews:', error);
             alert('리뷰 제출 중 오류가 발생했습니다.');
         }
-    };
-
-    const handleReport = (username) => {
-        // 신고할 사용자 설정
-        setReportingUser(username);
-    };
-
-    const closeModal = () => {
-        setReportingUser(null);
-    };
-
-    const submitReport = () => {
-        // 신고 제출 로직
-        console.log('신고된 사용자:', reportingUser);
-        alert(`${reportingUser}님을 신고했습니다.`);
-        setReportingUser(null);
     };
 
     const username = userInfo?.username || '사용자';
@@ -279,11 +209,6 @@ const ReviewPage = () => {
                                 alt="왕관"
                                 className="w-20 h-20 sm:w-24 sm:h-24"
                             />
-                            {/* <img
-                                src={celebrationEffect}
-                                alt="축하 이펙트"
-                                className="w-20 h-20 sm:w-24 sm:h-24 mt-2"
-                            /> */}
                         </div>
                     </div>
                 )}
@@ -354,80 +279,6 @@ const ReviewPage = () => {
                     </button>
                 </div>
             </div>
-
-            {/* {reportingUser && (
-                <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg shadow-lg w-full max-w-xs sm:max-w-md">
-                        <header className="bg-[#a16e47] text-white p-4 rounded-t-lg flex justify-between items-center">
-                            <img
-                                src={logo}
-                                alt="명톡 로고"
-                                className="w-8 h-8 sm:w-12 sm:h-12"
-                            />
-                        </header>
-                        <div className="p-6">
-                            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md flex flex-col items-center">
-                                <h3 className="text-lg sm:text-xl font-bold text-center mb-4">
-                                    {reportingUser}님을 신고합니다
-                                </h3>
-                                <p className="text-gray-700 mb-4 text-center">
-                                    신고 사유를 작성해주세요
-                                </p>
-                                <div className="space-y-2 sm:space-y-4 w-full">
-                                    {[
-                                        '말 없이 대화 종료',
-                                        '욕설, 부적절한 발언',
-                                        '성적인 언행',
-                                        '사기 및 스팸',
-                                        '기타',
-                                    ].map((reason) => (
-                                        <label
-                                            key={reason}
-                                            className="flex items-center space-x-2"
-                                        >
-                                            <input
-                                                type="radio"
-                                                name="reportReason"
-                                                value={reason}
-                                                checked={
-                                                    reportReason === reason
-                                                }
-                                                onChange={(e) =>
-                                                    setReportReason(
-                                                        e.target.value
-                                                    )
-                                                }
-                                                className="form-radio text-red-500"
-                                            />
-                                            <span className="text-gray-700">
-                                                {reason}
-                                            </span>
-                                        </label>
-                                    ))}
-                                    {reportReason === '기타' && (
-                                        <textarea
-                                            className="w-full p-2 border rounded-md"
-                                            placeholder="자세한 사유를 작성해주세요..."
-                                            value={reportDescription}
-                                            onChange={(e) =>
-                                                setReportDescription(
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-                                    )}
-                                </div>
-                                <button
-                                    className="bg-red-500 text-white px-4 py-2 rounded-full mt-4 sm:mt-6"
-                                    onClick={submitReport}
-                                >
-                                    신고하기
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )} */}
 
             {isFeedbackModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

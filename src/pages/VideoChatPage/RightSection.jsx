@@ -3,7 +3,7 @@ import dogWalkGif from '../../assets/dog.png';
 import dogHouseImage from '../../assets/mailbox.png'; // doghouse.gif 이미지로 변경
 import targetDogHouseImage from '../../assets/target_mailbox.png'; // doghouse.gif 이미지로 변경
 
-const MovingDogs = ({ sessionData, speechLengths, targetUserIndex }) => {
+const RightSection = ({ sessionData, speechLengths, targetUserIndex }) => {
     const safeSessionData = Array.isArray(sessionData) ? sessionData : [];
     const dogCount = Math.max(safeSessionData.length, 4); // 최소 4개의 강아지 보장
 
@@ -245,4 +245,4 @@ const MovingDogs = ({ sessionData, speechLengths, targetUserIndex }) => {
     );
 };
 
-export default MovingDogs;
+export default RightSection;
