@@ -5,21 +5,18 @@ import { OpenVidu } from 'openvidu-browser';
 import OpenViduVideo from './OpenViduVideo';
 import { apiCall, apiCallWithFileData } from '../../utils/apiCall';
 import { API_LIST } from '../../utils/apiList';
-import settingsIcon from '../../assets/settings-icon.jpg'; // 설정 아이콘
 import { getToken, getTokenForTest } from '../../services/openviduService';
-import SettingMenu from './SettingMenu';
+
 import io from 'socket.io-client';
 import RaccoonHand from '../../components/common/RaccoonHand';
 import RightSection from './RightSection.jsx';
-import forestBackground from '../../assets/forest-background.jpg'; // 배경 이미지 추가
+
 import logo from '../../assets/barking-talk.png'; // 로고 이미지 경로
-import RaccoonImg from '../../assets/WelcomeRaccoon.png'; // WelcomeModal 라쿤 이미지 추가
+
 import AIimg from '../../assets/ai.png'; // AI 이미지 추가
-import raccoonImage from '../../assets/raccoon.png';
-import start_modalSound from '../../assets/start_modal_sound.mp3';
-import endModalSound from '../../assets/end_modal_sound.mp3';
+
 import start_sound from '../../assets/sounds/start.mp3';
-import face_sound from '../../assets/sounds/face.mp3';
+
 import correct_sound from '../../assets/sounds/correct.mp3';
 import wrong_sound from '../../assets/sounds/wrong.mp3';
 import topic_sound from '../../assets/sounds/topic.mp3';
@@ -61,8 +58,6 @@ const VideoChatPage = () => {
     const [showQuizSuccess, setShowQuizSuccess] = useState(false);
     const [showQuizFailure, setShowQuizFailure] = useState(false);
 
-    const [showRecommendedTopics, setShowRecommendedTopics] = useState(false);
-    const [showQuizResult, setShowQuizResult] = useState(false);
 
     // const [showWelcomeModal, setShowWelcomeModal] = useState(false); // 자기소개 상태
 
@@ -88,20 +83,6 @@ const VideoChatPage = () => {
 
     // targetUserIndex 상태 추가
     const [targetUserIndex, setTargetUserIndex] = useState(null);
-
-    // const handleLogoClick = () => {
-    //     if (!isMissionInProgress && !showFaceRevealModal) {
-    //         const audio = new Audio(face_sound);
-    //         audio.play();
-    //         setShowFaceRevealModal(true);
-    //         const textToSpeak =
-    //             '얼굴 공개 타아아임! 드디어 진짜 우리의 모습을 볼 시간이에요!';
-    //         setTimeout(() => {
-    //             speakText(textToSpeak);
-    //         }, 1500);
-    //         setTimeout(() => setShowFaceRevealModal(false), 5000);
-    //     }
-    // };
 
     const handleQuizInProgress = (payload) => {
         console.log('자식컴포넌트로부터 넘겨받은 데이터 -> ', payload);
@@ -887,8 +868,6 @@ const VideoChatPage = () => {
             });
         }, 1000);
     };
-
-    const [useTestTopics, setUseTestTopics] = useState(false);
 
     // const QuizResultModal = ({ success, answer, onClose }) => {
     //     return (
