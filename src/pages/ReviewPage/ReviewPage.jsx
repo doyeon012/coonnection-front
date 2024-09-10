@@ -2,11 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import logo from '../../assets/barking-talk.png'; // 로고 이미지 경로
-import videoPlaceholder from '../../assets/people.png'; // 동영상 공간을 위한 이미지
-import Declaration from '../../assets/declaration.jpg'; // 동영상 공간을 위한 이미지
 
 import crownIcon from '../../assets/crown.png'; // 왕관 아이콘 이미지
-import celebrationEffect from '../../assets/celebration.gif'; // 축하 이펙트 이미지
 
 import { apiCall } from '../../utils/apiCall';
 import { API_LIST } from '../../utils/apiList';
@@ -70,33 +67,6 @@ const ReviewPage = () => {
                     { usernames }
                 );
 
-                // 사용자 정보 병합 및 필터링 (본인 제외)
-                const mergedData = callUserInfoResponse.data
-                    .filter((user) => user._id !== userInfo._id)
-                    .map((user) => ({
-                        ...user,
-                        userId: user.username,
-                        nickname: user.nickname || user.username,
-                        profileImage: user.profileImage || videoPlaceholder,
-                        utterance: user.utterance || 0,
-                    }));
-
-                /// 발화량이 가장 많은 사용자 찾기 (본인 포함)
-                const allUsers = [
-                    ...callUserInfoResponse.data,
-                    {
-                        username: userInfo.username,
-                        nickname: userInfo.nickname,
-                        utterance: userInfo.utterance || 0,
-                        profileImage: userInfo.profileImage || videoPlaceholder,
-                    },
-                ];
-                const topTalker = allUsers.reduce((prev, current) =>
-                    (prev.utterance || 0) > (current.utterance || 0)
-                        ? prev
-                        : current
-                );
-
                 const rankArr = [];
                 ranking.forEach((userRank, index) => {
                     const users = response.data;
@@ -109,40 +79,15 @@ const ReviewPage = () => {
                             );
                             if (profileData) {
                                 user.profileImage = profileData.profileImage;
+                                user._id = profileData._id; // _id 필드 병합
                             }
 
                             rankArr.push(user);
                         }
                     });
                 });
-                // const testArr = [
-                //     {
-                //         nickname: 'User1',
-                //         profileImage:
-                //             'https://talk-static-file-storage.s3.ap-northeast-2.amazonaws.com/img/0261765f-e398-4174-a21d-b8fb2a4eb44c-dog.jpg',
-                //     },
-                //     {
-                //         nickname: 'User2',
-                //         profileImage:
-                //             'https://talk-static-file-storage.s3.ap-northeast-2.amazonaws.com/img/0261765f-e398-4174-a21d-b8fb2a4eb44c-dog.jpg',
-                //     },
-                //     {
-                //         nickname: 'User3',
-                //         profileImage:
-                //             'https://talk-static-file-storage.s3.ap-northeast-2.amazonaws.com/img/0261765f-e398-4174-a21d-b8fb2a4eb44c-dog.jpg',
-                //     },
-                //     {
-                //         nickname: 'User4',
-                //         profileImage:
-                //             'https://talk-static-file-storage.s3.ap-northeast-2.amazonaws.com/img/0261765f-e398-4174-a21d-b8fb2a4eb44c-dog.jpg',
-                //     },
-                // ];
                 setUserRankings(rankArr);
-
                 setTopTalker(ranking[0]);
-                setSessionData(mergedData);
-                setCallUserInfo(mergedData);
-                setRatings(new Array(mergedData.length).fill(0));
 
                 console.log('Top Talker:', topTalker);
             } else {
@@ -165,8 +110,8 @@ const ReviewPage = () => {
         try {
             await apiCall(API_LIST.SUBMIT_REVIEW, {
                 sessionId,
-                reviews: sessionData.map((user, index) => ({
-                    userId: user._id, // userId를 username으로 변경
+                reviews: userRankings.map((_id, index) => ({
+                    userId: _id, // userId를 username으로 변경
                     rating: ratings[index],
                 })),
             });
