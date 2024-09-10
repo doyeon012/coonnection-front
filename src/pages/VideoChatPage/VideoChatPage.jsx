@@ -10,7 +10,7 @@ import { getToken, getTokenForTest } from '../../services/openviduService';
 import SettingMenu from './SettingMenu';
 import io from 'socket.io-client';
 import RaccoonHand from '../../components/common/RaccoonHand';
-import MovingDogs from './MovingDogs';
+import RightSection from './RightSection.jsx';
 import forestBackground from '../../assets/forest-background.jpg'; // 배경 이미지 추가
 import logo from '../../assets/barking-talk.png'; // 로고 이미지 경로
 import RaccoonImg from '../../assets/WelcomeRaccoon.png'; // WelcomeModal 라쿤 이미지 추가
@@ -1419,7 +1419,7 @@ const VideoChatPage = () => {
                 </div>
 
                 <div className="w-1/4 flex flex-col p-5 bg-gradient-to-b bg-white shadow-inner relative ">
-                    <MovingDogs
+                    <RightSection
                         sessionData={sessionData}
                         speechLengths={speechLengths}
                         targetUserIndex={targetUserIndex} // 새로운 prop 전달
